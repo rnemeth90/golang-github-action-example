@@ -1,0 +1,86 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: golang-hello-world-web
+  # allow for override: kubectl -n <ns> apply ...
+  #namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: golang-hello-world-web
+  # kubectl scale --replicas=x deployment/golang-hello-world-web
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: golang-hello-world-web
+      annotations:
+        sidecar.istio.io/inject: "false"
+
+    spec:
+
+      # scaled up deployment will go to different nodes
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - golang-hello-world-web
+            topologyKey: "kubernetes.io/hostname"
+
+
+      containers:
+      - name: golang-hello-world-web
+        image: ryannemeth/golang-github-action-example:1.0.0
+
+        # resource limits
+        resources:
+          requests:
+            memory: "8Mi"
+            cpu: "500m" # half a vcpu
+          limits:
+            memory: "16Mi"
+            cpu: "1000m" # whole vcpu
+
+        #env:
+        # default message
+        #- name: foo
+        #  value: bar
+
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 3
+
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 3
+
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: golang-hello-world-web-service
+  #namespace: default
+  labels:
+    app: golang-hello-world-web
+spec:
+  ports:
+  # port=available to other containers
+  - port: 8080
+    name: http
+    # targetPort=exposed from inside container
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: golang-hello-world-web
