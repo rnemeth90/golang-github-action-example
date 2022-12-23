@@ -13,8 +13,7 @@ newtag=v1.0.1; git tag $newtag && git push origin $newtag
 ```
 
 The image is published at these locations:
-* [Docker Hub](https://hub.docker.com/r/fabianlee/golang-github-action-example)
-* [Google Container Registry](https://github.com/fabianlee?tab=packages&repo_name=golang-github-action-example)
+* [Docker Hub](https://hub.docker.com/r/ryannemeth/golang-github-action-example)
 
 
 # Github Workflow for creating static binary release

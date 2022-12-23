@@ -37,7 +37,7 @@ CUR_DIR=${PWD##*/}
 mkdir -p build
 cp src/main.go build/main.go
 cd build
-[ -f go.mod ] || go mod init fabianlee/$CUR_DIR
+[ -f go.mod ] || go mod init rnemeth90/$CUR_DIR
 go mod tidy
 set -x
 go build -ldflags "-X main.Version=$newtag -X main.BuiltBy=bash" main.go
