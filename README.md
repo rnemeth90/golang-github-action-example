@@ -20,7 +20,7 @@ The image is published at these locations:
 
 [github-actions-release.yml](.github/workflows/github-actions-release.yml) creates a statically compiled GoLang binary along with Release Notes consisting of the recent git commit messages.
 
-This is triggered by creating a tag that looks like the semantic tag that starst with "r" (e.g. rX.Y.Z)
+This is triggered by creating a tag that looks like the semantic tag that starts with "r" (e.g. rX.Y.Z)
 
 ```
 newtag=r1.0.1; git tag $newtag && git push origin $newtag
@@ -54,8 +54,3 @@ gh release delete $todel --cleanup-tag -y
 # delete local tag
 git tag -d $todel
 ```
-
-
-
-
-# golang-github-action-example
