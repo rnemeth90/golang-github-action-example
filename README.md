@@ -2,20 +2,6 @@
 
 Basic Go http web server running on port 8080 used to illustrate GitHub Actions as Continuous Deployment pipeline.
 
-# GitHub Workflow for building OCI image
-
-[github-actions-buildOCI.yml](.github/workflows/github-actions-buildOCI.yml) creates an Image base on busybox:glibc using [Dockerfile](dockerfile).
-
-This is triggered by creating a tag that looks like the semantic tag that starts with "v" (e.g. vX.Y.Z)
-
-```
-newtag=v1.0.1; git tag $newtag && git push origin $newtag
-```
-
-The image is published at these locations:
-* [Docker Hub](https://hub.docker.com/r/ryannemeth/golang-github-action-example)
-
-
 # Github Workflow for creating static binary release
 
 [github-actions-release.yml](.github/workflows/github-actions-release.yml) creates a statically compiled GoLang binary along with Release Notes consisting of the recent git commit messages.
@@ -25,7 +11,6 @@ This is triggered by creating a tag that looks like the semantic tag that starts
 ```
 newtag=r1.0.1; git tag $newtag && git push origin $newtag
 ```
-
 
 # Creating tag
 
