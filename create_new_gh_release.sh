@@ -13,11 +13,11 @@ gh_bin=$(which gh)
 #
 # CALCULATE NEW SEMANTIC TAG (vX.Y.Z)
 #
-if git tag --sort=committerdate | grep -q ^v ; then
+if git tag --sort=committerdate | grep -q ^r ; then
 
   # get latest semantic version tag, construct patch+1
-  semantic_version=$(git tag --sort=-committerdate | grep ^v | grep -Po '^v[0-9]*.[0-9]*.[0-9]*' | head -n1)
-  [ -n "$semantic_version" ] || { echo "ERROR could not find semantic version vX.Y.Z"; exit 3; }
+  semantic_version=$(git tag --sort=-committerdate | grep ^r | grep -Po '^r[0-9]*.[0-9]*.[0-9]*' | head -n1)
+  [ -n "$semantic_version" ] || { echo "ERROR could not find semantic version rX.Y.Z"; exit 3; }
 
   major_minor=$(echo "$semantic_version" | cut -d'.' -f1-2)
   patch=$(echo "$semantic_version" | cut -d'.' -f3)
@@ -25,7 +25,7 @@ if git tag --sort=committerdate | grep -q ^v ; then
   newtag="${major_minor}.${patch}"
 else
   semantic_version=""
-  newtag="v1.0.0"
+  newtag="r1.0.0"
 fi
 echo "old version: $semantic_version new_version: ${newtag}"
 
