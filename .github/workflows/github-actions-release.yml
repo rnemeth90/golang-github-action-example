@@ -16,28 +16,32 @@ jobs:
     permissions:
       contents: write
 
-
     steps:
 
-    # debug
+    # print out the env vars for debugging
     - name: Dump env
       run: env | sort
+
+    # print out the github context for debugging
     - name: Dump GitHub context
       env:
         GITHUB_CONTEXT: ${{ toJson(github) }}
       run: echo "$GITHUB_CONTEXT"
 
+    # checkout our github repo to the build agent
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0 # get all tags, needed to get git log
         ref: main
 
-    # Go environment
+    # Setup the Go environment
     - name: setup Go Lang
       id: build
       uses: actions/setup-go@v3
       with:
         go-version: '^1.19.2'
+
+    # Build our application
     - run: |
         go version
         cd src
@@ -48,10 +52,12 @@ jobs:
         go build -ldflags "-X main.Version=${GITHUB_REF_NAME} -X main.BuiltBy=github-actions" main.go
         execFile=$(find . -type f -executable)
 
+    # Output more values for debugging
     - run: git version
     - run: git branch
     - run: git tag
 
+    # tag our release
     - name: get semantic tag version and release notes from commit messages
       id: tag
       run: |
@@ -74,6 +80,7 @@ jobs:
         echo "previousTag=$previousTag" >> $GITHUB_OUTPUT
         echo "line_count=$line_count" >> $GITHUB_OUTPUT
 
+    # Output more values for debugging
     - run: echo currentTag is ${{ steps.tag.outputs.currentTag }}
     - run: echo previousTag is ${{ steps.tag.outputs.previousTag }}
     - run: echo line_count is ${{ steps.tag.outputs.line_count }}
