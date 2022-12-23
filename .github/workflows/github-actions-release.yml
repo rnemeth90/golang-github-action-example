@@ -84,6 +84,6 @@ jobs:
       with:
         name: ${{ env.GITHUB_REF_NAME }}
         tag: ${{ env.GITHUB_REF_NAME }}
-        artifacts: "src/${{ steps.build.outputs.execFile }}"
+        artifacts: "src/main"
         bodyFile: "body.log"
         token: ${{ secrets.GITHUB_TOKEN }}
