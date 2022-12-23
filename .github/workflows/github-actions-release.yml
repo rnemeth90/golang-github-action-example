@@ -2,7 +2,7 @@ name: build-release-binary
 
 run-name: Create Github Release for GoLang binary
 
-on: 
+on:
   push:
     #branches:
     #- main
@@ -40,7 +40,7 @@ jobs:
     - run: |
         go version
         cd src
-        go mod init ${GITHUB_REPOSITORY}
+        # go mod init ${GITHUB_REPOSITORY}
         go mod tidy
         go build -ldflags "-X main.Version=${GITHUB_REF_NAME} -X main.BuiltBy=github-actions" main.go
 
@@ -49,7 +49,7 @@ jobs:
     - run: git tag
 
     - name: get semantic tag version and release notes from commit messages
-      id: tag 
+      id: tag
       run: |
         curtag=${GITHUB_REF_NAME}
         major_minor=$(echo "$curtag" | cut -d'.' -f1-2)
