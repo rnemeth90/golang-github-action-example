@@ -34,15 +34,19 @@ jobs:
 
     # Go environment
     - name: setup Go Lang
+      id: build
       uses: actions/setup-go@v3
       with:
         go-version: '^1.19.2'
     - run: |
         go version
         cd src
-        # go mod init ${GITHUB_REPOSITORY}
+        if [ ! -e *.mod ]; then
+          go mod init ${GITHUB_REPOSITORY}
+        fi
         go mod tidy
         go build -ldflags "-X main.Version=${GITHUB_REF_NAME} -X main.BuiltBy=github-actions" main.go
+        execFile=$(find . -type f -executable)
 
     - run: git version
     - run: git branch
@@ -51,27 +55,27 @@ jobs:
     - name: get semantic tag version and release notes from commit messages
       id: tag
       run: |
-        curtag=${GITHUB_REF_NAME}
-        major_minor=$(echo "$curtag" | cut -d'.' -f1-2)
-        patch=$(echo "$curtag" | cut -d'.' -f3)
+        currentTag=${GITHUB_REF_NAME}
+        major_minor=$(echo "$currentTag" | cut -d'.' -f1-2)
+        patch=$(echo "$currentTag" | cut -d'.' -f3)
         # avoid empty patch number
         [ -n "$patch" ] && ((patch--)) || patch=".x"
-        prevtag="${major_minor}.${patch}"
+        previousTag="${major_minor}.${patch}"
 
         echo "" > body.log
-        if git tag | grep $prevtag ; then
-          git log -q ${curtag}...${prevtag} --pretty="- %s" -q --no-color >> body.log
+        if git tag | grep $previousTag ; then
+          git log -q ${currentTag}...${previousTag} --pretty="- %s" -q --no-color >> body.log
         else
           git log --pretty="- %s" -q --no-color >> body.log
         fi
         line_count=$(cat body.log | wc -l)
 
-        echo "curtag=$curtag" >> $GITHUB_OUTPUT
-        echo "prevtag=$prevtag" >> $GITHUB_OUTPUT
+        echo "currentTag=$currentTag" >> $GITHUB_OUTPUT
+        echo "previousTag=$previousTag" >> $GITHUB_OUTPUT
         echo "line_count=$line_count" >> $GITHUB_OUTPUT
 
-    - run: echo curtag is ${{ steps.tag.outputs.curtag }}
-    - run: echo prevtag is ${{ steps.tag.outputs.prevtag }}
+    - run: echo currentTag is ${{ steps.tag.outputs.currentTag }}
+    - run: echo previousTag is ${{ steps.tag.outputs.previousTag }}
     - run: echo line_count is ${{ steps.tag.outputs.line_count }}
     - run: cat body.log
 
@@ -80,6 +84,6 @@ jobs:
       with:
         name: ${{ env.GITHUB_REF_NAME }}
         tag: ${{ env.GITHUB_REF_NAME }}
-        artifacts: "src/main"
+        artifacts: "src/${{ steps.build.outputs.execFile }}"
         bodyFile: "body.log"
         token: ${{ secrets.GITHUB_TOKEN }}
